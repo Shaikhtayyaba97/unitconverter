@@ -7,35 +7,54 @@ st.set_page_config(
     layout="centered"
 )
 
-# Custom CSS for Styling
+# Custom CSS with Background Animation
 st.markdown(
     """
     <style>
-        .main {
-            background-color: #f7f9fc;
+        /* Background Animation */
+        @keyframes gradientAnimation {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
         }
+
+        .main {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+
+        /* Styling for UI Components */
         div.stButton > button {
             background-color: #4CAF50;
             color: white;
             border-radius: 8px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 18px;
+            transition: transform 0.2s ease-in-out;
         }
         div.stButton > button:hover {
             background-color: #45a049;
+            transform: scale(1.05);
         }
+
         .stSelectbox, .stNumberInput {
             font-size: 18px;
         }
+
         .stTitle {
             font-weight: bold;
-            font-size: 28px;
+            font-size: 32px;
             text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
+
         .stMarkdown {
             text-align: center;
             font-size: 20px;
-            color: #4A4A4A;
+            color: white;
+            font-weight: bold;
         }
     </style>
     """,
@@ -57,18 +76,16 @@ category = st.selectbox(
 
 # Unit conversion logic
 def convert_unit(category, value, unit):
-    if category == "Length":
-        conversions = {
+    conversions = {
+        "Length": {
             "Kilometers to Miles": value * 0.621371,
             "Miles to Kilometers": value / 0.621371
-        }
-    elif category == "Weight":
-        conversions = {
+        },
+        "Weight": {
             "Kilograms to Pounds": value * 2.20462,
             "Pounds to Kilograms": value / 2.20462
-        }
-    elif category == "Time":
-        conversions = {
+        },
+        "Time": {
             "Seconds to Minutes": value / 60,
             "Minutes to Seconds": value * 60,
             "Minutes to Hours": value / 60,
@@ -76,19 +93,18 @@ def convert_unit(category, value, unit):
             "Hours to Days": value / 24,
             "Days to Hours": value * 24
         }
-    return conversions.get(unit, 0)
+    }
+    return conversions.get(category, {}).get(unit, 0)
 
 # Unit Selection based on Category
-if category == "Length":
-    unit = st.selectbox("📏 Select Conversion", ["Kilometers to Miles", "Miles to Kilometers"])
-elif category == "Weight":
-    unit = st.selectbox("⚖ Select Conversion", ["Kilograms to Pounds", "Pounds to Kilograms"])
-elif category == "Time":
-    unit = st.selectbox("⏳ Select Conversion", [
-        "Seconds to Minutes", "Minutes to Seconds",
-        "Minutes to Hours", "Hours to Minutes",
-        "Hours to Days", "Days to Hours"
-    ])
+unit = st.selectbox(
+    "🔄 Select Conversion",
+    {
+        "Length": ["Kilometers to Miles", "Miles to Kilometers"],
+        "Weight": ["Kilograms to Pounds", "Pounds to Kilograms"],
+        "Time": ["Seconds to Minutes", "Minutes to Seconds", "Minutes to Hours", "Hours to Minutes", "Hours to Days", "Days to Hours"]
+    }[category]
+)
 
 # User Input - Value to Convert
 value = st.number_input("🔢 Enter value to convert", min_value=0.0, format="%.2f")
